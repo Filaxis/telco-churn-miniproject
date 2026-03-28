@@ -19,12 +19,41 @@ telco-churn/
 ├── data/
 │   └── Telco-Customer-Churn.csv
 ├── outputs/
+│   ├── sql_eda.png
+│   ├── numeric_distributions.png
 │   ├── phase1_comparison.png
 │   ├── phase3_results.png
-│   └── confusion_matrices.png
+│   ├── confusion_matrices.png
+│   └── predictions.csv
 ├── telco_churn.ipynb
 └── README.md
 ```
+
+---
+
+## Exploratory Analysis with SQL
+
+Before preprocessing, the cleaned dataset was loaded into an in-memory SQLite database to run targeted business queries. This mirrors a realistic analyst workflow — querying a database before deciding which features to engineer and how to treat them.
+
+Five queries were run, each addressing a question a telecom analyst would naturally ask:
+
+| Question | Key Finding |
+|---|---|
+| Churn rate by contract type | Month-to-month: **42.7%** · One year: **11.3%** · Two year: **2.5%** |
+| Churn rate by internet service | Fiber optic: **41.9%** · DSL: **19.0%** · No service: **17.4%** |
+| Avg monthly charges: churned vs retained | Churned: **$74.44** · Retained: **$61.27** |
+| Churn rate by payment method | Electronic check: **45.3%** · All others: **15–19%** |
+| Churn rate: senior vs non-senior | Senior: **41.7%** · Non-senior: **23.6%** |
+
+![SQL exploratory analysis](outputs/sql_eda.png)
+
+**Interpretation:** The highest-risk customer profile is consistent across all five dimensions — month-to-month contract, fiber optic internet, electronic check payment, senior citizen. Notably, these factors appear to operate largely independently, with limited interaction effects. This finding directly informed the modelling expectation: if individual features already separate churn linearly, complex non-linear models are unlikely to add significant value.
+
+The three continuous features were also inspected prior to preprocessing:
+
+![Numeric feature distributions](outputs/numeric_distributions.png)
+
+Tenure is right-skewed with a concentration of recent customers. Total charges mirrors tenure as expected — a downstream consequence of contract length. Monthly charges shows a bimodal distribution, suggesting two distinct customer segments by service tier. The presence of outliers and skew in all three features motivated the use of `RobustScaler` in the preprocessing pipeline.
 
 ---
 
@@ -59,7 +88,7 @@ All models evaluated with 5-fold stratified cross-validation, scored on ROC-AUC.
 
 ![Phase 1 model comparison](outputs/phase1_comparison.png)
 
-**Key finding:** Logistic Regression outperforms all ensemble methods at default settings. This reflects the largely linear, shallow nature of the churn signal in this dataset — contract type, tenure, and monthly charges have near-monotonic relationships with churn probability that a linear model captures efficiently. Tree ensembles gain their advantage from modelling complex feature interactions; those interactions are not strongly present here at this dataset scale.
+**Key finding:** Logistic Regression outperforms all ensemble methods at default settings. This reflects the largely linear, shallow nature of the churn signal in this dataset — contract type, tenure, and monthly charges have near-monotonic relationships with churn probability that a linear model captures efficiently. Tree ensembles gain their advantage from modelling complex feature interactions; those interactions are not strongly present here at this dataset scale. This confirms what the SQL analysis already suggested.
 
 ---
 
