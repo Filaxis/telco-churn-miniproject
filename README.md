@@ -6,7 +6,7 @@ A structured machine learning project on the IBM Telco Customer Churn dataset, c
 
 ## Project Overview
 
-Customer churn — the rate at which customers stop using a service — is a high-value prediction target for subscription businesses. This project builds a complete, production-style ML pipeline from raw data to tuned model, with emphasis on understanding *why* each modelling decision was made, not just *what* was done.
+Customer churn — the rate at which customers stop using a service — is a high-value prediction target for subscription businesses. This project builds a complete, production-style ML pipeline from raw data to tuned model, with emphasis on understanding *why* each modelling decision was made.
 
 **Dataset:** IBM Telco Customer Churn (~7,000 customers, 20 features, ~26% churn rate)
 
@@ -55,7 +55,7 @@ The three continuous features were also inspected prior to preprocessing:
 
 ![Numeric feature distributions](outputs/numeric_distributions.png)
 
-Tenure is right-skewed with a concentration of recent customers. Total charges mirrors tenure as expected — a downstream consequence of contract length. Monthly charges shows a bimodal distribution, suggesting two distinct customer segments by service tier. The presence of outliers and skew in all three features motivated the use of `RobustScaler` in the preprocessing pipeline.
+Tenure shows a bimodal distribution with peaks at both extremes — a concentration of very new customers (0–12 months) and a concentration of long-term customers (60–72 months), with relatively few in between. This reflects two distinct customer behaviours: early churners who leave quickly, and loyal customers who stay for years. Total charges is right-skewed, with a sharp spike at low values and an extended tail reaching ~8500. This shape follows directly from its multiplicative origin — total charges is effectively tenure multiplied by monthly charges, and since the large population of new customers guarantees many low products regardless of their monthly rate, low values dominate strongly. The distribution is not a clean exponential decay however; a broad plateau stretches across the middle range before the tail thins out, possibly a consequence of the bimodal structure of both parent distributions spreading their products across a wide intermediate range. Monthly charges shows a bimodal distribution, suggesting two distinct customer segments by service tier. The presence of outliers and skew in all three features motivated the use of `RobustScaler` in the preprocessing pipeline.
 
 ---
 
