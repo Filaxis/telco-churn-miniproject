@@ -24,8 +24,10 @@ telco-churn/
 │   ├── phase1_comparison.png
 │   ├── phase3_results.png
 │   ├── confusion_matrices.png
+│   ├── churn_data_clean.csv
 │   └── predictions.csv
 ├── telco_churn.ipynb
+├── telco_churn_dashboard.pbix
 └── README.md
 ```
 
@@ -142,6 +144,34 @@ GridSearchCV (5-fold, ROC-AUC scoring) was applied to the two most promising mod
 - **XGBoost** is more selective: lower recall, higher precision, fewer false positives. Preferred when interventions are costly (e.g. agent calls, large discounts).
 
 Model selection for production would depend on the business cost matrix, not AUC alone.
+
+---
+
+## Power BI Dashboard
+
+An interactive dashboard (`telco_churn_dashboard.pbix`) was built on top of the model outputs to translate the ML results into a business-facing view. It requires **Power BI Desktop** (free) to open.
+
+The dashboard connects two data sources — the cleaned dataset (`churn_data_clean.csv`) and the test-set predictions (`predictions.csv`) — joined on `customerID`.
+
+**Page 1 — Churn Landscape & Model Performance**
+
+Provides population-level context using the full dataset alongside model evaluation results:
+
+- KPI cards: total customers, overall churn rate, average monthly charges
+- Churn rate by contract type, internet service type, and tenure band
+- 7-model comparison table with CV and test AUC scores
+- Live confusion matrix (TP, TN, FP, FN) for XGBoost (tuned)
+- Text headlines for the two tuned models' test AUC scores
+
+**Page 2 — High-Risk Targeting**
+
+Demonstrates the operational value of the models — which customers should a retention team prioritise:
+
+- Model toggle slicer (Logistic Regression vs XGBoost) — all visuals update dynamically
+- KPI cards: flagged customers above 50% predicted probability, actual churn rate among flagged
+- Scatter plot: monthly charges vs predicted churn probability, coloured by actual churn outcome
+- Bar chart: flagged customer count by contract type
+- Ranked table: customers sorted by predicted churn probability, with tenure, contract, monthly charges, and actual churn outcome
 
 ---
 
